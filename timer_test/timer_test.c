@@ -15,7 +15,7 @@ static int count = 0;
 
 static void count_timer_handler(struct timer_list *timer)
 {
-	mod_timer(&count_timer, jiffies + HZ);
+	mod_timer(timer, jiffies + HZ);
 	printk(KERN_ALERT "count=%d\n", count);
 	count++;
 }
