@@ -24,3 +24,8 @@ index[0]=0
 index[1]=10
 index[2]=9
 goodbye, name=wahaha
+
+非法入参，入参个数超过了index数组长度
+sudo insmod hello.ko name="wahaha" count="13" index=10,9,8,7,6,5,4,3,2,1
+[sudo] password for mango: 
+insmod: ERROR: could not insert module hello.ko: Invalid parameters
