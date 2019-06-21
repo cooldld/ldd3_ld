@@ -6,7 +6,6 @@
 #include <linux/uaccess.h> /*for copy_from/to_user()*/
 
 #define GMEM_SIZE 0x1000
-/*#define GMEM_MAJOR 230*/
 
 static int gmem_major = 0;
 
