@@ -5,13 +5,13 @@
 #include <linux/slab.h> /*for kzalloc()*/
 
 #define GMEM_SIZE 0x1000
-/*#define GMEM_MAJOR 230*/
 
 static int gmem_major = 0;
 
 module_param(gmem_major, int, S_IRUGO);
 
-struct gmem_dev {
+struct gmem_dev
+{
 	struct cdev cdev;
 	unsigned char data[GMEM_SIZE];
 };
