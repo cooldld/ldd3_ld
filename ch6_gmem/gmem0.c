@@ -5,7 +5,7 @@
 #include <linux/slab.h> /*for kzalloc()*/
 
 #define GMEM_SIZE 0x1000
-#define GMEM_MAJOR 230
+/*#define GMEM_MAJOR 230*/
 
 static int gmem_major = 0;
 
@@ -37,6 +37,7 @@ static void gmem_setup_cdev(struct gmem_dev *dev, int index)
 
 static int __init gmem_init(void)
 {
+#define CHRDEV_NAME "gmem"
 	int ret;
 	dev_t devno;
 
@@ -48,11 +49,11 @@ static int __init gmem_init(void)
 
 	if (gmem_major)
 	{
-		ret = register_chrdev_region(devno, 1, "gmem");
+		ret = register_chrdev_region(devno, 1, CHRDEV_NAME);
 	}
 	else
 	{
-		ret = alloc_chrdev_region(&devno, 0, 1, "gmen");
+		ret = alloc_chrdev_region(&devno, 0, 1, CHRDEV_NAME);
 		gmem_major = MAJOR(devno);
 	}
 	if (ret < 0)
@@ -60,6 +61,8 @@ static int __init gmem_init(void)
 		printk(KERN_NOTICE "register chrdev fail");
 		return ret;
 	}
+
+	printk(KERN_ALERT "major=%d, minor=%d\n", MAJOR(devno), MINOR(devno));
 
 	gmem_device = kzalloc(sizeof(struct gmem_dev), GFP_KERNEL);
 	if (NULL == gmem_device)
