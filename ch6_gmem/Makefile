@@ -4,6 +4,7 @@ PWD := $(shell pwd)
 obj-m += gmem0.o
 obj-m += gmem1.o
 obj-m += gmem2.o
+obj-m += gmem3.o
 
 modules:
 	make -C $(KERNELDIR) M=$(PWD) modules

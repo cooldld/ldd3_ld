@@ -15,7 +15,7 @@ $ sudo echo hello > gmem0_dev
 zsh: permission denied: gmem0_dev
 
 gmem1.c
-增加了file_operations的操作open/release/read/write/llseek
+在gmem0.c上增加了file_operations的操作open/release/read/write/llseek
 $ make
 $ sudo insmod gmem1.ko
 Jun 21 15:11:05 ub18 kernel: [95198.393437] gmem_init
@@ -27,4 +27,7 @@ $ cat gmem_dev
 hello
 
 gmem2.c
-创建多个字符设备
+在gmem1.c上创建多个字符设备
+
+gmem3.c
+在gmem2.c上加入mutex的控制
