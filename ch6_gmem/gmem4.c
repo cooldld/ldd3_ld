@@ -4,8 +4,9 @@
 #include <linux/cdev.h>
 #include <linux/slab.h> /*for kzalloc()*/
 #include <linux/uaccess.h> /*for copy_from/to_user()*/
+#include <linux/sched/signal.h> /*for signal_pending()*/
 
-#define GMEM_SIZE 0x1000
+#define GMEM_SIZE 10 //0x1000
 
 static int gmem_major = 0;
 
@@ -14,7 +15,11 @@ module_param(gmem_major, int, S_IRUGO);
 struct gmem_dev
 {
 	struct cdev cdev;
+	int len;
 	unsigned char data[GMEM_SIZE];
+	struct mutex mutex;
+	wait_queue_head_t r_wait;
+	wait_queue_head_t w_wait;
 };
 
 struct gmem_dev *gmem_device;
@@ -36,37 +41,65 @@ static ssize_t gmem_read(struct file *filp, char __user *buf, size_t count,
 		loff_t *f_pos)
 {
 	struct gmem_dev *dev;
-	unsigned long pos;
 	ssize_t ret;
-
-	printk(KERN_ALERT "%s, f_pos=%lld\n", __FUNCTION__, *f_pos);
+	DECLARE_WAITQUEUE(wait, current);
 
 	/*init*/
 	dev = filp->private_data;
-	pos = *f_pos;
 	ret = 0;
 
-	if (pos >= GMEM_SIZE)
+	printk(KERN_ALERT "%s, current len=%d\n", __FUNCTION__, dev->len);
+
+	mutex_lock(&dev->mutex);
+	add_wait_queue(&dev->r_wait, &wait);
+
+	while (0 == dev->len)
 	{
-		return 0;
+		if (filp->f_flags & O_NONBLOCK)
+		{
+			ret = -EAGAIN;
+			goto out;
+		}
+		__set_current_state(TASK_INTERRUPTIBLE);
+		mutex_unlock(&dev->mutex);
+
+		schedule();
+		if (signal_pending(current))
+		{
+			printk(KERN_ALERT "%s, wake by singal\n", __FUNCTION__);
+			ret = -ERESTARTSYS;
+			goto out2;
+		}
+
+		mutex_lock(&dev->mutex);
 	}
 
-	if (count + pos > GMEM_SIZE)
+	if (count > dev->len)
 	{
-		count = GMEM_SIZE - pos;
+		count = dev->len;
 	}
 
-	if (copy_to_user(buf, dev->data + pos, count))
+	if (copy_to_user(buf, dev->data, count))
 	{
 		ret = -EFAULT;
+		goto out;
 	}
 	else
 	{
-		*f_pos += count;
+		memmove(dev->data, dev->data + count, dev->len - count);
+		dev->len -= count;
 		ret = count;
 
-		printk(KERN_ALERT "read count=%ld\n", count);
+		printk(KERN_ALERT "read count=%ld, len=%d\n", count, dev->len);
+
+		wake_up_interruptible(&dev->w_wait);
 	}
+
+out:
+	mutex_unlock(&dev->mutex);
+out2:
+	remove_wait_queue(&dev->r_wait, &wait);
+	set_current_state(TASK_RUNNING);
 
 	return ret;
 }
@@ -75,37 +108,66 @@ static ssize_t gmem_write(struct file *filp, const char __user *buf,
 		size_t count, loff_t *f_pos)
 {
 	struct gmem_dev *dev;
-	unsigned long pos;
 	ssize_t ret;
-
-	printk(KERN_ALERT "%s, f_pos=%lld\n", __FUNCTION__, *f_pos);
+	DECLARE_WAITQUEUE(wait, current);
 
 	/*init*/
 	dev = filp->private_data;
-	pos = *f_pos;
 	ret = 0;
 
-	if (pos >= GMEM_SIZE)
+	printk(KERN_ALERT "%s, current len=%d\n", __FUNCTION__, dev->len);
+
+	mutex_lock(&dev->mutex);
+	add_wait_queue(&dev->w_wait, &wait);
+
+	while (dev->len == GMEM_SIZE)
 	{
-		return 0;
+		if (filp->f_flags & O_NONBLOCK)
+		{
+			ret = -EAGAIN;
+			goto out;
+		}
+
+		__set_current_state(TASK_INTERRUPTIBLE);
+
+		mutex_unlock(&dev->mutex);
+
+		schedule();
+		if (signal_pending(current))
+		{
+			printk(KERN_ALERT "%s, wake by singal\n", __FUNCTION__);
+			ret = -ERESTARTSYS;
+			goto out2;
+		}
+
+		mutex_lock(&dev->mutex);
 	}
 
-	if (count + pos > GMEM_SIZE)
+	if (count + dev->len > GMEM_SIZE)
 	{
-		count = GMEM_SIZE - pos;
+		count = GMEM_SIZE - dev->len;
 	}
 
-	if (copy_from_user(dev->data + pos, buf, count))
+	if (copy_from_user(dev->data + dev->len, buf, count))
 	{
 		ret = -EFAULT;
+		goto out;
 	}
 	else
 	{
-		*f_pos += count;
+		dev->len += count;
 		ret = count;
 
 		printk(KERN_ALERT "write, count=%ld\n", count);
+
+		wake_up_interruptible(&dev->r_wait);
 	}
+
+out:
+	mutex_unlock(&dev->mutex);
+out2:
+	remove_wait_queue(&dev->w_wait, &wait);
+	set_current_state(TASK_RUNNING);
 
 	return ret;
 }
@@ -160,8 +222,7 @@ static loff_t gmem_llseek(struct file *filp, loff_t offset, int whence)
 
 #define GMEM_IOCTL_CLEAR _IO(GMEM_IOCTL_TYPE, GMEM_CLEAR_NR)
 
-static long gmem_ioctl(struct file *filp, unsigned int cmd,
-		unsigned long arg)
+static long gmem_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	struct gmem_dev *dev = filp->private_data;
 
@@ -171,7 +232,9 @@ static long gmem_ioctl(struct file *filp, unsigned int cmd,
 	switch (cmd)
 	{
 	case GMEM_IOCTL_CLEAR:
+		mutex_lock(&dev->mutex);
 		memset(dev->data, 0, GMEM_SIZE);
+		mutex_unlock(&dev->mutex);
 		printk(KERN_ALERT "gmem clear\n");
 		break;
 	default:
@@ -245,6 +308,11 @@ static int __init gmem_init(void)
 	}
 
 	gmem_setup_cdev(gmem_device, 0);
+
+	mutex_init(&gmem_device->mutex);
+	init_waitqueue_head(&gmem_device->r_wait);
+	init_waitqueue_head(&gmem_device->w_wait);
+
 	return 0;
 
 fail:

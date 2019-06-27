@@ -31,7 +31,7 @@ static void gmem_setup_cdev(struct gmem_dev *dev, int index)
 	err = cdev_add(&dev->cdev, devno, 1);
 	if (err)
 	{
-		printk(KERN_NOTICE "cdev_add fail, index=%d, err=%d", index, err);
+		printk(KERN_NOTICE "cdev_add fail, index=%d, err=%d\n", index, err);
 	}
 }
 
@@ -58,7 +58,7 @@ static int __init gmem_init(void)
 	}
 	if (ret < 0)
 	{
-		printk(KERN_NOTICE "register chrdev fail");
+		printk(KERN_NOTICE "register chrdev fail\n");
 		return ret;
 	}
 
@@ -67,7 +67,7 @@ static int __init gmem_init(void)
 	gmem_device = kzalloc(sizeof(struct gmem_dev), GFP_KERNEL);
 	if (NULL == gmem_device)
 	{
-		printk(KERN_NOTICE "kzalloc fail");
+		printk(KERN_NOTICE "kzalloc fail\n");
 		goto fail;
 	}
 
@@ -89,3 +89,5 @@ static void __exit gmem_exit(void)
 	printk(KERN_ALERT "%s\n", __FUNCTION__);
 }
 module_exit(gmem_exit);
+
+MODULE_LICENSE("GPL v2");

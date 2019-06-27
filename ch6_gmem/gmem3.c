@@ -25,7 +25,7 @@ static int gmem_open(struct inode *inode, struct file *filp)
 {
 	struct gmem_dev *dev = container_of(inode->i_cdev, struct gmem_dev, cdev);
 
-	printk(KERN_ALERT "%s", __FUNCTION__);
+	printk(KERN_ALERT "%s\n", __FUNCTION__);
 
 	filp->private_data = dev;
 	return 0;
@@ -33,7 +33,7 @@ static int gmem_open(struct inode *inode, struct file *filp)
 
 static int gmem_release(struct inode *inode, struct file *filp)
 {
-	printk(KERN_ALERT "%s", __FUNCTION__);
+	printk(KERN_ALERT "%s\n", __FUNCTION__);
 	return 0;
 }
 
@@ -44,7 +44,7 @@ static ssize_t gmem_read(struct file *filp, char __user *buf, size_t count,
 	unsigned long pos;
 	ssize_t ret;
 
-	printk(KERN_ALERT "%s, f_pos=%lld", __FUNCTION__, *f_pos);
+	printk(KERN_ALERT "%s, f_pos=%lld\n", __FUNCTION__, *f_pos);
 
 	/*init*/
 	dev = filp->private_data;
@@ -72,7 +72,7 @@ static ssize_t gmem_read(struct file *filp, char __user *buf, size_t count,
 		*f_pos += count;
 		ret = count;
 
-		printk(KERN_ALERT "read count=%ld", count);
+		printk(KERN_ALERT "read count=%ld\n", count);
 	}
 
 	mutex_unlock(&dev->mutex);
@@ -87,7 +87,7 @@ static ssize_t gmem_write(struct file *filp, const char __user *buf,
 	unsigned long pos;
 	ssize_t ret;
 
-	printk(KERN_ALERT "%s, f_pos=%lld", __FUNCTION__, *f_pos);
+	printk(KERN_ALERT "%s, f_pos=%lld\n", __FUNCTION__, *f_pos);
 
 	/*init*/
 	dev = filp->private_data;
@@ -115,7 +115,7 @@ static ssize_t gmem_write(struct file *filp, const char __user *buf,
 		*f_pos += count;
 		ret = count;
 
-		printk(KERN_ALERT "write, count=%ld", count);
+		printk(KERN_ALERT "write, count=%ld\n", count);
 	}
 
 	mutex_unlock(&dev->mutex);
@@ -127,7 +127,7 @@ static loff_t gmem_llseek(struct file *filp, loff_t offset, int whence)
 {
 	loff_t ret = 0;
 
-	printk(KERN_ALERT "%s, offset=%lld, whence=%d",
+	printk(KERN_ALERT "%s, offset=%lld, whence=%d\n",
 			__FUNCTION__, offset, whence);
 
 	switch (whence)
@@ -178,7 +178,7 @@ static long gmem_ioctl(struct file *filp, unsigned int cmd,
 {
 	struct gmem_dev *dev = filp->private_data;
 
-	printk(KERN_ALERT "%s, cmd=%d, arg=%ld",
+	printk(KERN_ALERT "%s, cmd=%d, arg=%ld\n",
 			__FUNCTION__, cmd, arg);
 
 	switch (cmd)
@@ -187,7 +187,7 @@ static long gmem_ioctl(struct file *filp, unsigned int cmd,
 		mutex_lock(&dev->mutex);
 		memset(dev->data, 0, GMEM_SIZE);
 		mutex_unlock(&dev->mutex);
-		printk(KERN_ALERT "gmem clear");
+		printk(KERN_ALERT "gmem clear\n");
 		break;
 	default:
 		return -EINVAL;
@@ -219,7 +219,7 @@ static void gmem_setup_cdev(struct gmem_dev *dev, int index)
 	err = cdev_add(&dev->cdev, devno, 1);
 	if (err)
 	{
-		printk(KERN_NOTICE "cdev_add fail, index=%d, err=%d", index, err);
+		printk(KERN_NOTICE "cdev_add fail, index=%d, err=%d\n", index, err);
 	}
 }
 
@@ -247,7 +247,7 @@ static int __init gmem_init(void)
 	}
 	if (ret < 0)
 	{
-		printk(KERN_NOTICE "register chrdev fail");
+		printk(KERN_NOTICE "register chrdev fail\n");
 		return ret;
 	}
 
@@ -256,7 +256,7 @@ static int __init gmem_init(void)
 	gmem_device = kzalloc(sizeof(struct gmem_dev) * GMEM_DEV_NUM, GFP_KERNEL);
 	if (NULL == gmem_device)
 	{
-		printk(KERN_NOTICE "kzalloc fail");
+		printk(KERN_NOTICE "kzalloc fail\n");
 		goto fail;
 	}
 
@@ -288,3 +288,5 @@ static void __exit gmem_exit(void)
 	printk(KERN_ALERT "%s\n", __FUNCTION__);
 }
 module_exit(gmem_exit);
+
+MODULE_LICENSE("GPL v2");

@@ -8,11 +8,11 @@ $ make
 $ sudo insmod gmem0.ko
 Jun 21 10:42:27 ub18 kernel: [79081.181809] gmem_init
 Jun 21 10:42:27 ub18 kernel: [79081.181814] major=242, minor=0
-$ sudo mknod gmem0_dev c 242 0
-$ cat gmem0_dev 
-cat: gmem0_dev: No such device or address
-$ sudo echo hello > gmem0_dev 
-zsh: permission denied: gmem0_dev
+$ sudo mknod gmem_dev c 242 0
+$ cat gmem_dev 
+cat: gmem_dev: No such device or address
+$ sudo echo hello > gmem_dev 
+zsh: permission denied: gmem_dev
 
 gmem1.c
 在gmem0.c上增加了file_operations的操作open/release/read/write/llseek
@@ -23,11 +23,26 @@ Jun 21 15:11:05 ub18 kernel: [95198.393441] major=242, minor=0
 $ sudo mknod gmem_dev c 242 0
 $ sudo chmod 777 gmem_dev
 $ echo hello > gmem_dev
-$ cat gmem_dev 
+$ cat gmem_dev
 hello
 
 gmem2.c
 在gmem1.c上创建多个字符设备
 
 gmem3.c
-在gmem2.c上加入mutex的控制
+在gmem2.c上增加mutex的控制
+
+gmem4.c
+在gmem1.c上增加mutex和wait queue的控制
+在一个终端执行写操作
+$ echo "12345678901234567890" > gmem_dev
+在另一个终端执行读操作
+$ dd if=gmem_dev of=/dev/stdout bs=1 count=1
+系统日志信息
+Jun 27 16:12:53 ub18 kernel: [21870.913744] gmem_open
+Jun 27 16:12:53 ub18 kernel: [21870.913749] gmem_llseek, offset=0, whence=1
+Jun 27 16:12:53 ub18 kernel: [21870.914167] gmem_read, current len=10
+Jun 27 16:12:53 ub18 kernel: [21870.914171] read count=1, len=9
+Jun 27 16:12:53 ub18 kernel: [21870.914179] write, count=1
+Jun 27 16:12:53 ub18 kernel: [21870.914184] gmem_write, current len=10
+Jun 27 16:12:53 ub18 kernel: [21870.914326] gmem_release
