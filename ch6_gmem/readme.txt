@@ -50,9 +50,11 @@ Jun 27 16:12:53 ub18 kernel: [21870.914326] gmem_release
 gmem5.c
 在gmem4.c上增加poll的操作
 $ grep gmem /proc/devices
+$ make -f Makefile_test
 select_test.c用seletct api来验证
-$ gcc select_test.c -o select_test
 $ ./select_test gmem_dev
 epoll_test.c用epoll api来验证
-$ gcc epoll_test.c -o epoll_test
 $ ./epoll_test gmem_dev
+
+gmem6.c
+在gmem5.c上增加异步通知(fasync)的操作

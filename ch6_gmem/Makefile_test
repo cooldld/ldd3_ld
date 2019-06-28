@@ -1,6 +1,8 @@
 all:
 	gcc select_test.c -o select_test
 	gcc epoll_test.c -o epoll_test
+	gcc fasync_test.c -o fasync_test
+	gcc fasync_stdin.c -o fasync_stdin
 
 clean:
-	rm -f select_test epoll_test
+	rm -f select_test epoll_test fasync_test fasync_stdin
