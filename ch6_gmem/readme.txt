@@ -9,9 +9,9 @@ $ sudo insmod gmem0.ko
 Jun 21 10:42:27 ub18 kernel: [79081.181809] gmem_init
 Jun 21 10:42:27 ub18 kernel: [79081.181814] major=242, minor=0
 $ sudo mknod gmem_dev c 242 0
-$ cat gmem_dev 
+$ cat gmem_dev
 cat: gmem_dev: No such device or address
-$ sudo echo hello > gmem_dev 
+$ sudo echo hello > gmem_dev
 zsh: permission denied: gmem_dev
 
 gmem1.c
@@ -46,3 +46,13 @@ Jun 27 16:12:53 ub18 kernel: [21870.914171] read count=1, len=9
 Jun 27 16:12:53 ub18 kernel: [21870.914179] write, count=1
 Jun 27 16:12:53 ub18 kernel: [21870.914184] gmem_write, current len=10
 Jun 27 16:12:53 ub18 kernel: [21870.914326] gmem_release
+
+gmem5.c
+在gmem4.c上增加poll的操作
+$ grep gmem /proc/devices
+select_test.c用seletct api来验证
+$ gcc select_test.c -o select_test
+$ ./select_test gmem_dev
+epoll_test.c用epoll api来验证
+$ gcc epoll_test.c -o epoll_test
+$ ./epoll_test gmem_dev

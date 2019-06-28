@@ -6,6 +6,7 @@ obj-m += gmem1.o
 obj-m += gmem2.o
 obj-m += gmem3.o
 obj-m += gmem4.o
+obj-m += gmem5.o
 
 modules:
 	make -C $(KERNELDIR) M=$(PWD) modules

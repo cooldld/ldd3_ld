@@ -1,0 +1,6 @@
+all:
+	gcc select_test.c -o select_test
+	gcc epoll_test.c -o epoll_test
+
+clean:
+	rm -f select_test epoll_test
