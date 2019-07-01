@@ -6,6 +6,7 @@ all:
 	make -C timer_test
 	make -C gmem_cdev
 	make -C hello_tasklet
+	make -C hello_work_queue
 
 clean:
 	make clean -C export_symbol
@@ -15,3 +16,4 @@ clean:
 	make clean -C timer_test
 	make clean -C gmem_cdev
 	make clean -C hello_tasklet
+	make clean -C hello_work_queue
