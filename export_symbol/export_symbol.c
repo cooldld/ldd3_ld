@@ -1,8 +1,6 @@
 #include <linux/init.h>
 #include <linux/module.h>
 
-MODULE_LICENSE("Dual BSD/GPL");
-
 int add_integar(int a, int b)
 {
 	return a + b;
@@ -15,3 +13,4 @@ int sub_integar(int a, int b)
 }
 EXPORT_SYMBOL_GPL(sub_integar);
 
+MODULE_LICENSE("Dual BSD/GPL");

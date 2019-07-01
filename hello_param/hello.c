@@ -1,8 +1,6 @@
 #include <linux/init.h>
 #include <linux/module.h>
 
-MODULE_LICENSE("Dual BSD/GPL");
-
 static char *name = "world";
 static int count = 2;
 static int index[8] = {};
@@ -34,3 +32,5 @@ static void __exit hello_exit(void)
 
 module_init(hello_init);
 module_exit(hello_exit);
+
+MODULE_LICENSE("Dual BSD/GPL");

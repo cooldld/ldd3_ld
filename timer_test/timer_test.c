@@ -2,8 +2,6 @@
 #include <linux/module.h>
 #include <linux/timer.h>
 
-MODULE_LICENSE("GPL");
-
 static void count_timer_handler(struct timer_list *timer);
 
 #if 0
@@ -35,3 +33,5 @@ static void __exit timer_test_exit(void)
 
 module_init(timer_test_init);
 module_exit(timer_test_exit);
+
+MODULE_LICENSE("Dual BSD/GPL");

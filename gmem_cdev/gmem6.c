@@ -379,4 +379,4 @@ static void __exit gmem_exit(void)
 }
 module_exit(gmem_exit);
 
-MODULE_LICENSE("GPL v2");
+MODULE_LICENSE("Dual BSD/GPL");
