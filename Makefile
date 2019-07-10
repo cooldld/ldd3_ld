@@ -8,6 +8,7 @@ all:
 	make -C hello_tasklet
 	make -C hello_work_queue
 	make -C hello_memory
+	make -C hello_mmap
 
 clean:
 	make clean -C export_symbol
@@ -19,3 +20,4 @@ clean:
 	make clean -C hello_tasklet
 	make clean -C hello_work_queue
 	make clean -C hello_memory
+	make clean -C hello_mmap

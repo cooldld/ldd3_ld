@@ -12,12 +12,12 @@ static unsigned char *ptr6;
 static unsigned char *ptr7;
 static unsigned char *ptr8;
 static unsigned char *ptr9;
+static int order;
 
 static int __init hello_init(void)
 {
 	unsigned char *phys_addr;
 	int size;
-	int order;
 
 	/*init*/
 	size = 100 * 1024;
@@ -86,10 +86,10 @@ static void __exit hello_exit(void)
 	kfree(ptr2);
 	kfree(ptr3);
 	kfree(ptr4);
-	free_page((unsigned long)ptr5);
-	free_page((unsigned long)ptr6);
-	free_page((unsigned long)ptr7);
-	free_page((unsigned long)ptr8);
+	free_pages((unsigned long)ptr5, order);
+	free_pages((unsigned long)ptr6, order);
+	free_pages((unsigned long)ptr7, order);
+	free_pages((unsigned long)ptr8, order);
 	vfree(ptr9);
 	printk(KERN_ALERT "%s\n", __FUNCTION__);
 }
