@@ -16,12 +16,28 @@ static unsigned long phys_addr;
 static int hello_open(struct inode *inode, struct file *filp)
 {
 	printk(KERN_ALERT "%s\n", __FUNCTION__);
+	hello_data = kmalloc(HELLO_DATA_LEN, GFP_KERNEL);
+	printk(KERN_ALERT "hello_data=0x%p\n", hello_data);
+
+	/*必须要做这一步，保证申请的空间真实可用*/
+	memset(hello_data, 0, HELLO_DATA_LEN);
+
+	strcpy(hello_data, "hello world");
+	printk(KERN_ALERT "hello_data=%s\n", hello_data);
+
+	phys_addr = virt_to_phys(hello_data);
+	printk(KERN_ALERT "phys_addr=0x%lx\n", phys_addr);
+
 	return 0;
 }
 
 static int hello_release(struct inode *inode, struct file *filp)
 {
 	printk(KERN_ALERT "%s\n", __FUNCTION__);
+	if (NULL != hello_data)
+	{
+		kfree(hello_data);
+	}
 	return 0;
 }
 
@@ -99,28 +115,13 @@ static int __init hello_init(void)
 	printk(KERN_ALERT "major=%d, minor=%d\n", MAJOR(devno), MINOR(devno));
 
 	hello_setup_cdev(0);
-
-	hello_data = kmalloc(HELLO_DATA_LEN, GFP_KERNEL);
-	if (NULL == hello_data)
-	{
-		printk(KERN_ALERT "kmalloc fail\n");
-		return -1;
-	}
-	printk(KERN_ALERT "hello_data=0x%p\n", hello_data);
-
-	memset(hello_data, 0, HELLO_DATA_LEN);
-	phys_addr = virt_to_phys(hello_data);
-	printk(KERN_ALERT "phys_addr=0x%lx\n", phys_addr);
-
-	snprintf(hello_data, HELLO_DATA_LEN, "%s", "hello world");
-
 	return 0;
 }
 module_init(hello_init);
 
 static void __exit hello_exit(void)
 {
-	kfree(hello_data);
+	/*kfree(hello_data);*/
 	cdev_del(&hello_cdev);
 	unregister_chrdev_region(MKDEV(hello_major, 0), 1);
 

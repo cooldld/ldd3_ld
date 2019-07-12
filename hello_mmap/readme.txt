@@ -35,14 +35,30 @@ sudo chmod 777 hello_dev
 gcc mmap_test.c
 
 $ ./a.out hello_dev
-before mmap
-after mmap, mapBuf=hello world
+map_buf[0]=0x68
+map_buf[1]=0x65
+map_buf[2]=0x6c
+map_buf[3]=0x6c
+map_buf[4]=0x6f
+map_buf[5]=0x20
+map_buf[6]=0x77
+map_buf[7]=0x6f
+map_buf[8]=0x72
+map_buf[9]=0x6c
+map_buf[10]=0x64
+map_buf[11]=0x0
+map_buf[12]=0x0
+map_buf[13]=0x0
+map_buf[14]=0x0
+map_buf[15]=0x0
+map_buf=hello world
 
 message info
-Jul 10 14:17:32 ub18 kernel: [11925.581764] hello_init
-Jul 10 14:17:32 ub18 kernel: [11925.581767] major=243, minor=0
-Jul 10 14:17:32 ub18 kernel: [11925.581770] hello_data=0x00000000cdeb5302
-Jul 10 14:17:32 ub18 kernel: [11925.581771] phys_addr=0x32ae4000
-Jul 10 14:17:39 ub18 kernel: [11933.145274] hello_open
-Jul 10 14:17:59 ub18 kernel: [11953.145612] hello_mmap
-Jul 10 14:18:14 ub18 kernel: [11968.146955] hello_release
+Jul 12 13:59:14 ub18 kernel: [ 8902.661203] hello_init
+Jul 12 13:59:14 ub18 kernel: [ 8902.661206] major=243, minor=0
+Jul 12 13:59:25 ub18 kernel: [ 8914.084054] hello_open
+Jul 12 13:59:25 ub18 kernel: [ 8914.084058] hello_data=0x000000000bcbba44
+Jul 12 13:59:25 ub18 kernel: [ 8914.084059] hello_data=hello world
+Jul 12 13:59:25 ub18 kernel: [ 8914.084060] phys_addr=0xce9a6000
+Jul 12 13:59:25 ub18 kernel: [ 8914.084062] hello_mmap
+Jul 12 13:59:26 ub18 kernel: [ 8915.088326] hello_release
