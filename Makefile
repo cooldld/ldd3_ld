@@ -9,6 +9,7 @@ all:
 	make -C hello_work_queue
 	make -C hello_memory
 	make -C hello_mmap
+	make -C hello_platform
 
 clean:
 	make clean -C export_symbol
@@ -21,3 +22,4 @@ clean:
 	make clean -C hello_work_queue
 	make clean -C hello_memory
 	make clean -C hello_mmap
+	make clean -C hello_platform
